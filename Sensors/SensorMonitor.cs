@@ -65,11 +65,11 @@ public static class SensorMonitor {
             UpdatePumpThreshold(); // Read Threshold data from HAS
 
             // toggle pump for 3 seconds
-            if (lastHumidity != null && lastHumidity > PumpTreshold) {
+            if (lastHumidity != null && lastHumidity < PumpTreshold) {
                 PumpWater();
             }
 
-            Thread.Sleep(10000);
+            Thread.Sleep(600000);
         }
     }
 
@@ -113,40 +113,40 @@ public static class SensorMonitor {
         return true;
     }
 
-    private static void UpdatePumpThreshold() {
-        if (HaContext is null) throw new Exception("Unable to get value. HaContext = null");
+private static void UpdatePumpThreshold() {
+    if (HaContext is null) throw new Exception("Unable to get value. HaContext = null");
 
-        const string entityId = "input_number.pump_threshold";
+    const string entityId = "input_number.pump_threshold";
 
-        try {
-            // Get the current state of the input_number entity
-            var state = HaContext.GetState(entityId);
+    try {
+        // Get the current state of the input_number entity
+        var state = HaContext.GetState(entityId);
 
-            if (state != null) {
-                Console.WriteLine($"Current value of {entityId}: {state?.State}");
-                PumpTreshold = double.Parse(state?.State!, CultureInfo.InvariantCulture);
-            } else {
-                Console.WriteLine($"Entity {entityId} not found or state is null.");
-            }
-        } catch (Exception ex) {
-            Console.WriteLine($"Error reading state of {entityId}: {ex.Message}");
+        if (state != null) {
+            Console.WriteLine($"Current value of {entityId}: {state?.State}");
+            PumpTreshold = double.Parse(state?.State!, CultureInfo.InvariantCulture);
+        } else {
+            Console.WriteLine($"Entity {entityId} not found or state is null.");
         }
+    } catch (Exception ex) {
+        Console.WriteLine($"Error reading state of {entityId}: {ex.Message}");
     }
+}
 
-    public static async void SendSensorDataToHomeAssistant(IMqttEntityManager entityManager, double temperature, double humidity) {
+public static async void SendSensorDataToHomeAssistant(IMqttEntityManager entityManager, double temperature, double humidity) {
 
-        try {
-            Console.WriteLine("Sending temperature and humidty data...");
+    try {
+        Console.WriteLine("Sending temperature and humidty data...");
 
-            await entityManager.SetStateAsync("sensor.greenhouse_temperature", temperature.ToString());
-            await entityManager.SetStateAsync("sensor.greenhouse_humidity", humidity.ToString());
+        await entityManager.SetStateAsync("sensor.greenhouse_temperature", temperature.ToString());
+        await entityManager.SetStateAsync("sensor.greenhouse_humidity", humidity.ToString());
 
-            Console.WriteLine($"Sent Temperature: {temperature} to Home Assistant");
-            Console.WriteLine($"Sent Humidity: {humidity} to Home Assistant");
-        } catch (Exception ex) {
-            Console.WriteLine($"Failed to send data to Home Assistant: {ex.Message}");
-        }
+        Console.WriteLine($"Sent Temperature: {temperature} to Home Assistant");
+        Console.WriteLine($"Sent Humidity: {humidity} to Home Assistant");
+    } catch (Exception ex) {
+        Console.WriteLine($"Failed to send data to Home Assistant: {ex.Message}");
     }
+}
 }
 
 

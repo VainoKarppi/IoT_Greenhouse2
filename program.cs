@@ -21,22 +21,23 @@ try {
     // Resolve the IMqttEntityManager from the service provider
     var entityManager = host.Services.GetRequiredService<IMqttEntityManager>();
 
-    Console.WriteLine($"MANAGER 1: {entityManager}");
-
 
     // Run the host in a separate task
     var hostTask = host.RunAsync();
     
     // Start the monitor after the server has been started finally
     new Thread(() => {
+        // Wait for 2 seconds to make sure the connection is finilazied, before we start the monitor to be able to fetch the entityManager
         Thread.Sleep(2000);
+
+        // TODO add WaitUntil connection == success
 
         // Start the sensor monitor with the entity manager on raspberry pi (disabled for windows)
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
             SensorMonitor.StartMonitor(entityManager);
         }
         
-        // DEBUG DATA
+        // DEBUG SEND DATA (without raspi)
         while (true) {
             SensorMonitor.SendSensorDataToHomeAssistant(entityManager, 20 + new Random().Next(10), 20 + new Random().Next(10));
             Thread.Sleep(10000);
