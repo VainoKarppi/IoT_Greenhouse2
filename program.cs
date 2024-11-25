@@ -39,6 +39,7 @@ try {
         
         // DEBUG SEND DATA (without raspi)
         while (true) {
+            Console.WriteLine("USING DEBUG DATA");
             SensorMonitor.SendSensorDataToHomeAssistant(entityManager, 20 + new Random().Next(10), 20 + new Random().Next(10));
             Thread.Sleep(10000);
         }
