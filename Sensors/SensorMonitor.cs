@@ -69,7 +69,7 @@ public static class SensorMonitor {
                 PumpWater();
             }
 
-            Thread.Sleep(600000);
+            Thread.Sleep(10000);
         }
     }
 
